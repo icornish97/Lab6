@@ -22,14 +22,42 @@ unzip(zipfile, exdir = outDir)
 data <- read.xport("dataset/2016/LLCP2016.XPT")
 ```
 
-## Follow up
+## Variables
 
-```{R}
-plot(pressure)
-```
-
-## Visual Summary
-
-```{R}
-
-```
+X_STATE
+IDATE
+IMONTH
+IDAY 
+IYEAR
+SEX
+AGE
+ALCDAY5
+GENHLTH (1- 5 excellent-poor 7, 9, and blank are NA)
+MENTHLTH
+AVEGRNK2
+DRNK3GE5 
+MAXDRNKS
+ACEDRINK
+CHCOCNCR (Cancer)
+DRNKANY5 
+DROCDY3_
+DIABETE3 (Diabetes) 
+_DRNKDY4
+_DRNKMO4
+RMVTETH3 (Tooth Decay) 
+MARITAL
+CHILDREN
+_RFDRMN4
+EDUCA
+EMPLOY
+_RFDRWM4
+INCOME2
+SMOKE100
+WEIGHT2
+SMOKDAY2
+LASTSMK2
+USENOW3
+USEEQUIP
+_SMOKER3
+DRNKDRI2
+_RFSMOK3 
