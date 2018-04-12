@@ -7,15 +7,19 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(foreign)
+install.packages("SASxport")
+library(SASxport)
 ```
 
 ## Marginal Distributions/Densities
 
 
 
-```{R}
-data <- read.xport()
+```{R, cache = TRUE}
+zipfile <- "./dataset/2016/LLCP2016XPT.zip"
+outDir <- "./dataset/2016"
+unzip(zipfile, exdir = outDir)
+data <- read.xport("dataset/2016/LLCP2016.XPT")
 ```
 
 ## Follow up
