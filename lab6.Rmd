@@ -1,0 +1,31 @@
+---
+title: "lab6"
+authors:Austin Collins, Ian Cornish, Taylor Rouse, and Omar Taylor
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(foreign)
+```
+
+## Marginal Distributions/Densities
+
+
+
+```{R}
+data <- read.xport()
+```
+
+## Follow up
+
+```{R}
+plot(pressure)
+```
+
+## Visual Summary
+
+```{R}
+
+```
