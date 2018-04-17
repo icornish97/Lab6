@@ -26,7 +26,11 @@ library(tidyverse)
 install.packages("SASxport", repos = "http://cran.us.r-project.org")
 library(SASxport)
 
+<<<<<<< HEAD
 ```
+=======
+## Dataset
+>>>>>>> f9c33008c6f829e5af796868b74ecf87db3af57f
 
 ### Marginal Distributions/Densities
 
