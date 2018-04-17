@@ -1,18 +1,34 @@
 ---
-title: "lab6"
-authors:Austin Collins, Ian Cornish, Taylor Rouse, and Omar Taylor
+title: "Lab 6"
+author:
+- "Austin Collins"
+- "Ian Cornish"
+- "Taylor Rouse"
+- "Omar Taylor"
+date: "April 12, 2018"
 output: html_document
 ---
+
+## GitHub Repository
+https://github.com/icornish97/Lab6
+
+# Dataset Overview
+We have chosen to continue working with the Behavioral Risk Factor Surveillance System (BRFSS) dataset. The difference this time is that we are analyzing specific variables from the data for all 50 states instead of just for Iowa, as we did during our midterm exam. Additionally, we plan to merge the dataset from a variable amount of years in order to analyze how time has had an effect on the results. As you know, this dataset is an aggregation of the responses from surveys collected from all 50 states about the health-related risk behaviors, chronic health conditions, and use of preventive services from U.S. residents.
+
+# Cleaning Steps
+Since we are working with a multi-year dataset, with the data from each year having their own respective files, joining the data will be part of the challenge. Since we have selected a finite amount of variables to analyze for teh dataset, we will have to work to condense the data to only include such columns. All further cleaning will depend on what analyses we are trying to conduct as we work through our data, such as separating the data into key value pairs if necessary, refactoring variables, changing types, etc. We have already gotten started with the cleaning process, which can be viewed below
+
+## Code Thus Far
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-install.packages("SASxport")
+install.packages("SASxport", repos = "http://cran.us.r-project.org")
 library(SASxport)
+
 ```
 
-## Marginal Distributions/Densities
-
+### Marginal Distributions/Densities
 
 
 ```{R, cache = TRUE}
@@ -24,40 +40,42 @@ data <- read.xport("dataset/2016/LLCP2016.XPT")
 
 ## Variables
 
-X_STATE
-IDATE
-IMONTH
-IDAY 
-IYEAR
-SEX
-AGE
-ALCDAY5
-GENHLTH (1- 5 excellent-poor 7, 9, and blank are NA)
-MENTHLTH
-AVEGRNK2
-DRNK3GE5 
-MAXDRNKS
-ACEDRINK
-CHCOCNCR (Cancer)
-DRNKANY5 
-DROCDY3_
-DIABETE3 (Diabetes) 
-_DRNKDY4
-_DRNKMO4
-RMVTETH3 (Tooth Decay) 
-MARITAL
-CHILDREN
-_RFDRMN4
-EDUCA
-EMPLOY
-_RFDRWM4
-INCOME2
-SMOKE100
-WEIGHT2
-SMOKDAY2
-LASTSMK2
-USENOW3
-USEEQUIP
-_SMOKER3
-DRNKDRI2
-_RFSMOK3 
+These are the list of variables we have selected to analyze from the large dataset.
+
+- X_STATE
+- IDATE
+- IMONTH
+- IDAY 
+- IYEAR
+- SEX
+- AGE
+- ALCDAY5
+- GENHLTH (1- 5 excellent-poor 7, 9, and blank are NA)
+- MENTHLTH
+- AVEGRNK2
+- DRNK3GE5 
+- MAXDRNKS
+- ACEDRINK
+- CHCOCNCR (Cancer)
+- DRNKANY5 
+- DROCDY3_
+- DIABETE3 (Diabetes) 
+- _DRNKDY4
+- _DRNKMO4
+- RMVTETH3 (Tooth Decay) 
+- MARITAL
+- CHILDREN
+- _RFDRMN4
+- EDUCA
+- EMPLOY
+- _RFDRWM4
+- INCOME2
+- SMOKE100
+- WEIGHT2
+- SMOKDAY2
+- LASTSMK2
+- USENOW3
+- USEEQUIP
+- _SMOKER3
+- DRNKDRI2
+- _RFSMOK3 
