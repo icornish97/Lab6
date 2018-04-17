@@ -26,11 +26,8 @@ library(tidyverse)
 install.packages("SASxport", repos = "http://cran.us.r-project.org")
 library(SASxport)
 
-<<<<<<< HEAD
+
 ```
-=======
-## Dataset
->>>>>>> f9c33008c6f829e5af796868b74ecf87db3af57f
 
 ### Marginal Distributions/Densities
 
@@ -42,7 +39,7 @@ unzip(zipfile, exdir = outDir)
 data <- read.xport("dataset/2016/LLCP2016.XPT")
 ```
 
-## Variables
+## Variables From Dataset
 
 These are the list of variables we have selected to analyze from the large dataset.
 
