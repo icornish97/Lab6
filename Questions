@@ -26,4 +26,4 @@ time (from dataset), SMOKDAY2
 MENTHLTH, INCOME2
 
 (Austin) What is the marital status of heavy drinkers vs casual/non-drinkers
-MARIRAL, DRNK3GE5 (Over/Under 10)
+MARITAL, DRNK3GE5 (Over/Under 10)
