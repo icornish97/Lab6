@@ -5,7 +5,7 @@ AVEGRNK2, SEX
 not drink alot.
 MENTHLTH, DRNK3GE5 (Over 10) 
 
-(Ian) What is the general health of people that do not drink alot versus people that do
+(Ian) What is the general health of people that drink alot versus people that do
 not drink alot.
 GENHLTH, DRNK3GE5 (Over 10) 
 
@@ -13,7 +13,7 @@ GENHLTH, DRNK3GE5 (Over 10)
 not smoke alot.
 MENTHLTH, SMOKDAY2 (Every day(1))
 
-(Taylor) What is the general health of people that do not smoke alot versus people that smoke alot.
+(Taylor) What is the general health of people that do smoke alot versus people that do not smoke alot.
 GENHLTH, SMOKDAY2 (Every day(1))
 
 (tentative) Over time, what is the change in the number of people that drink heavily? 
