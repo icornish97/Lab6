@@ -80,3 +80,24 @@ These are the list of variables we have selected to analyze from the large datas
 - _SMOKER3
 - DRNKDRI2
 - _RFSMOK3 
+
+How many days on average with poor mental health did people who drink alot have versus people that do
+not drink alot.
+MENTHLTH, DRNK3GE5 (Over 10) 
+
+```{R}
+heavyDrinkers <- data %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+heavyDrinkers$status <- "Heavy"
+lightDrinkers <- data %>% filter(DRNK3GE5<10 & DRNK3GE5 < 76 ) %>% filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(MENTHLTH)
+lightDrinkers$status <- "Light"
+tmp <- rbind(heavyDrinkers, lightDrinkers)
+tmp$MENTHLTH[tmp$MENTHLTH == 88] <- 0
+drinkData <- tmp
+drinkData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) 
+drinkData %>% ggplot(aes (x = status, y = MENTHLTH)) + geom_boxplot()
+```
+
+What is the general health of people that drink alot versus people that do
+not drink alot.
+GENHLTH, DRNK3GE5 (Over 10) 
+
