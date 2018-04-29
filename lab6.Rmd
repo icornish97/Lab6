@@ -93,13 +93,37 @@ lightDrinkers$status <- "Light"
 tmp <- rbind(heavyDrinkers, lightDrinkers)
 tmp$MENTHLTH[tmp$MENTHLTH == 88] <- 0
 drinkData <- tmp
-drinkData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) 
-drinkData %>% ggplot(aes (x = status, y = MENTHLTH)) + geom_boxplot()
+drinkData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) %>% ggplot(aes (x= status, y=avgMentalHealth))+ geom_col() + labs(x= "Drinking Status", y = "Average days (in the last 30) with bad mental health")
 ```
+
 
 What is the general health of people that drink alot versus people that do
 not drink alot.
 GENHLTH, DRNK3GE5 (Over 10) 
+```{R}
+data %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH)
+heavyDrinkersGen <- data %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH) 
+heavyDrinkersGen$status <- "Heavy"
+lightDrinkersGen <- data %>% filter(DRNK3GE5<10 & DRNK3GE5 < 76 ) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH)
+lightDrinkersGen$status <- "Light"
+
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 1] <- "Excellent"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 2] <- "Very Good"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 3] <- "Good"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 4] <- "Fair"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 5] <- "Poor"
+
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 1] <- "Excellent"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 2] <- "Very Good"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 3] <- "Good"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 4] <- "Fair"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 5] <- "Poor"
+
+heavyDrinkersGen$GENHLTH <- factor(heavyDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+lightDrinkersGen$GENHLTH <- factor(lightDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+lightDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of light drinkers")
+heavyDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of heavy drinkers")
+```
 
 How many days on average with poor mental health did people who smoke alot have versus people that do not smoke a lot or not at all?
 
