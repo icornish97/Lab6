@@ -101,3 +101,20 @@ What is the general health of people that drink alot versus people that do
 not drink alot.
 GENHLTH, DRNK3GE5 (Over 10) 
 
+How many days on average with poor mental health did people who smoke alot have versus people that do not smoke a lot or not at all?
+
+```
+heavySmokers <- data %>% filter(SMOKDAY2==1) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+heavySmokers$status <- "Heavy Smocker"
+moderateSmokers <- data %>% filter(SMOKDAY2==2) %>% filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(MENTHLTH)
+moderateSmokers$status <- "Moderate Smoker"
+nonSmokers <- data %>% filter(SMOKDAY2==3) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+nonSmokers$status <- "Non Smoker"
+tmp2 <- rbind(heavySmokers, moderateSmokers, nonSmokers)
+tmp2$MENTHLTH[tmp2$MENTHLTH == 88] <- 0
+smokerData <- tmp2
+smokerData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) 
+smokerData %>% ggplot(aes (x = status , y = MENTHLTH)) + geom_boxplot()
+```
+What is the general health of people that smoke alot versus people that do not smoke alot or not at all.
+
