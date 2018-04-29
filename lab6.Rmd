@@ -128,5 +128,5 @@ nonSmokers2$status <- "Non Smoker"
 tmp2 <- rbind(heavySmokers2, moderateSmokers2, nonSmokers2)
 smokerData <- tmp2
 smokerData %>% group_by(status) %>% summarise(avgGenreralHealth = mean(GENHLTH)) 
-smokerData %>% ggplot(aes (x = status, fill=GENHLTH)) + geom_histogram()
+smokerData %>% ggplot(aes (x = status, y=GENHLTH)) + geom_boxplot()
 ```
