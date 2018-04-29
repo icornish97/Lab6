@@ -118,3 +118,15 @@ smokerData %>% ggplot(aes (x = status , y = MENTHLTH)) + geom_boxplot()
 ```
 What is the general health of people that smoke alot versus people that do not smoke alot or not at all.
 
+```
+heavySmokers2 <- data %>% filterfilter(SMOKDAY2==1) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+heavySmokers2$status <- "Heavy Smocker"
+moderateSmokers2 <- data %>% filter(SMOKDAY2==2) %>% filter(GENHLTH <= 5) %>% select(GENHLTH)
+moderateSmokers2$status <- "Moderate Smoker"
+nonSmokers2 <- data %>% filter(SMOKDAY2==3) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+nonSmokers2$status <- "Non Smoker"
+tmp2 <- rbind(heavySmokers2, moderateSmokers2, nonSmokers2)
+smokerData <- tmp2
+smokerData %>% group_by(status) %>% summarise(avgGenreralHealth = mean(GENHLTH)) 
+smokerData %>% ggplot(aes (x = status, fill=GENHLTH)) + geom_histogram()
+```
