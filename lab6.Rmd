@@ -93,9 +93,9 @@ lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 5] <- "Poor"
 heavyDrinkersGen$GENHLTH <- factor(heavyDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
 lightDrinkersGen$GENHLTH <- factor(lightDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
 lightDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of light drinkers")
-lightDrinkersGen %>% group_by(GENHLTH) %>% summarise(numberOfRespondents = n())
+lightDrinkersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(lightDrinkersGen))
 heavyDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of heavy drinkers")
-heavyDrinkersGen %>% group_by(GENHLTH) %>% summarise(numberOfRespondents = n())
+heavyDrinkersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(heavyDrinkersGen))
 ```
 
 How many days on average with poor mental health did people who smoke alot have versus people that do not smoke a lot or not at all?
