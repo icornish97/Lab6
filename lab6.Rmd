@@ -143,14 +143,39 @@ smokerData %>% ggplot(aes (x = status , y = MENTHLTH)) + geom_boxplot()
 What is the general health of people that smoke alot versus people that do not smoke alot or not at all.
 
 ```
-heavySmokers2 <- data %>% filterfilter(SMOKDAY2==1) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
-heavySmokers2$status <- "Heavy Smocker"
-moderateSmokers2 <- data %>% filter(SMOKDAY2==2) %>% filter(GENHLTH <= 5) %>% select(GENHLTH)
-moderateSmokers2$status <- "Moderate Smoker"
-nonSmokers2 <- data %>% filter(SMOKDAY2==3) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
-nonSmokers2$status <- "Non Smoker"
-tmp2 <- rbind(heavySmokers2, moderateSmokers2, nonSmokers2)
-smokerData <- tmp2
-smokerData %>% group_by(status) %>% summarise(avgGenreralHealth = mean(GENHLTH)) 
-smokerData %>% ggplot(aes (x = status, y=GENHLTH)) + geom_boxplot()
+heavySmokersGen<- data %>% filter(SMOKDAY2==1) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+heavySmokersGen$status <- "Heavy Smocker"
+moderateSmokersGen <- data %>% filter(SMOKDAY2==2) %>% filter(GENHLTH <= 5) %>% select(GENHLTH)
+moderateSmokersGen$status <- "Moderate Smoker"
+nonSmokersGen<- data %>% filter(SMOKDAY2==3) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+nonSmokersGen$status <- "Non Smoker"
+
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 1] <- "Excellent"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 2] <- "Very Good"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 3] <- "Good"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 4] <- "Fair"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 5] <- "Poor"
+
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 1] <- "Excellent"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 2] <- "Very Good"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 3] <- "Good"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 4] <- "Fair"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 5] <- "Poor"
+
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 1] <- "Excellent"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 2] <- "Very Good"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 3] <- "Good"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 4] <- "Fair"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 5] <- "Poor"
+
+heavySmokersGen$GENHLTH <- factor(heavySmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+moderateSmokersGen$GENHLTH <- factor(moderateSmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+nonSmokersGen$GENHLTH <- factor(nonSmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+
+heavySmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of heavy smokers")
+moderateSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of moderate smokers")
+nonSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of nonsmokers")
+
+tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
+tmp %>% ggplot(aes(x = GENHLTH, fill=status)) + geom_bar(position="fill")
 ```
