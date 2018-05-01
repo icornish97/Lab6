@@ -451,6 +451,10 @@ tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
 tmp %>% ggplot(aes(x = GENHLTH, fill=status)) + geom_bar(position="fill")+
   ggtitle("General Health Breakdown vs Smoking Habits")+
   theme(axis.text=element_text(size=10),axis.title=element_text(size=14), title=element_text(size=16))
+  
+heavySmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(heavySmokersGen))
+moderateSmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(moderateSmokersGen))
+nonSmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(nonSmokersGen))
 ```
 What is the relationship between mental health and income.
 ```{r}
