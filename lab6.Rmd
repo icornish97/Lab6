@@ -248,8 +248,14 @@ IncomeMental3 <- IncomeMental2 %>% group_by(INCOME2) %>% summarise(avgMentalHeal
 IncomeMental3$INCOME2 <- as.factor(IncomeMental3$INCOME2)
 IncomeMental3 %>% group_by(INCOME2) %>%
   ggplot(aes (x= INCOME2, y=avgMentalHealth))+ 
-  geom_col() + labs(x= "Income Status",
-                    y = "Average days (in the last 30) with bad mental health")+ theme(axis.text.x = element_text(angle = 30, hjust = 1))+ggtitle("Income Status vs Mental Health")
+  geom_col() + labs(x= "Income Status",y = "Average days (in the last 30) with bad mental health")+ 
+                    theme(axis.text.x = element_text(angle = 30, hjust = 1))+
+                    ggtitle("Income Status vs Mental Health")
+                
+heavySmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(heavySmokersGen))
+moderateSmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(moderateSmokersGen))
+nonSmokersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(nonSmokersGen))
+
 ```
 
 ---
