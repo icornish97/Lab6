@@ -1,0 +1,290 @@
+---
+title: "Behavioral Risk Factor Surveillance System Data Exploration | Final Project Team 1"
+author:
+- "Austin Collins"
+- "Ian Cornish"
+- "Taylor Rouse"
+- "Omar Taylor"
+date: "April 12, 2018"
+output: html_document
+---
+
+## GitHub Repository
+https://github.com/icornish97/Lab6
+
+# Dataset Overview
+We have chosen to continue working with the Behavioral Risk Factor Surveillance System (BRFSS) dataset. The difference this time is that we are analyzing specific variables from the LLCP2016 for all 50 states instead of just for Iowa, as we did during our midterm exam. Additionally, we plan to merge the dataset from a variable amount of years in order to analyze how time has had an effect on the results. As you know, this dataset is an aggregation of the responses from surveys collected from all 50 states about the health-related risk behaviors, chronic health conditions, and use of preventive services from U.S. residents.
+
+# Cleaning Steps
+Since we are working with a multi-year dataset, with the LLCP2016 from each year having their own respective files, joining the LLCP2016 will be part of the challenge. Since we have selected a finite amount of variables to analyze for the dataset, we will have to work to condense the LLCP2016 to only include such columns. All further cleaning will depend on what analyses we are trying to conduct as we work through our LLCP2016, such as separating the LLCP2016 into key value pairs if necessary, refactoring variables, changing types, etc. We have already gotten started with the cleaning process, which can be viewed below
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+install.packages("SASxport", repos = "http://cran.us.r-project.org")
+dataset.dir <- "./dataset/"
+zipfile <- paste(dataset.dir, "2016/LLCP2016.XPT")
+outDir <- paste(dataset.dir, "2016")
+unzip(zipfile, exdir = outDir)
+```
+
+## Getting Started
+```{r, cache = T}
+LLCP2016 <- SASxport::read.xport("dataset/2016/LLCP2016.XPT")
+```
+
+## Variables From Dataset
+
+These are the list of variables we have selected to analyze from the large dataset.
+
+- AVEDRNK2
+- SEX
+- MENTHLTH
+- GENHTLH
+- DRNK3GE5
+- SMOKDAY2
+- INCOME2
+- MARITAL
+
+## Alcohol & Public Health Questions
+
+### What is the average number of drinks that males and females have when they drink?
+
+The variables being explored here are *AVEDRNK2* and *SEX*. *AVEDRNK2* represents the average number of alcoholic drinks consumed per day in the past 30 days. *SEX* respresends the respondents sex as it relates to demographics. The two variables are coded as follows:
+
+---
+
+#### The Codebook
+
+```{r echo = F, results = 'asis'}
+avedrnk2.matrix <- matrix(c("1 - 76", "Number of drinks", 233060, 98.30, 98.01, "77", "Don't know/Not sure", 3131, 1.32, 1.61, "99", "Refused", 889, 0.37, 0.37, "BLANK", "Not asked or Missing", 249223, NA, NA), ncol = 5, byrow = T)
+colnames(avedrnk2.matrix) <- c("Value", "Value Label", "Frequency", "Percentage", "Weighted Percentage")
+
+knitr::kable(avedrnk2.matrix, caption = "AVEDRNK2 Codebook")
+```
+```{r echo = F, results = 'asis'}
+sex.matrix <- matrix(c(1, "Male", 210606, 43.31, 48.66, 2, "Female", 275631, 56.68, 51.33, 9, "Refused", 66, 0.01, 0.01), ncol = 5, byrow = T)
+colnames(sex.matrix) <- c("Value", "Value Label", "Frequency", "Percentage", "Weighted Percentage")
+
+knitr::kable(sex.matrix, caption = "SEX Codebook")
+```
+
+---
+
+#### Computed Results
+```{r}
+# The variables we're working with
+vars <- c("AVEDRNK2", "SEX")
+
+# Let's subset the data so we're working with just AVEDRNK2 and SEX.
+Q1 <- LLCP2016 %>% subset(AVEDRNK2 > 0 & AVEDRNK2 < 77 & SEX > 0 & SEX < 3) %>% select(matches(paste(vars, collapse = "|")))
+
+# Categorize SEX variable
+Q1$SEX <- Q1$SEX %>% factor(c(1, 2), c("male", "female"))
+
+# Bring back the label
+attr(Q1$SEX, "label") <- attr(LLCP2016$SEX, "label") %>% tolower()
+
+# Compute summary with average asked for by question.
+Q1.summary <- Q1 %>% group_by(SEX) %>% summarise(avgdrnk = mean(AVEDRNK2))
+
+# Bring back the label
+attr(Q1.summary$avgdrnk, "label") <- attr(Q1$AVEDRNK2, "label") %>% tolower()
+
+# Define function for title casing
+capwords <- function(s, strict = FALSE) {
+    cap <- function(s) paste(toupper(substring(s, 1, 1)),
+                  {s <- substring(s, 2); if(strict) tolower(s) else s},
+                             sep = "", collapse = " " )
+    sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
+}
+
+# Plot the result.
+Q1.summary %>% ggplot(aes(SEX, avgdrnk, fill = SEX)) + geom_bar(stat = "identity") + geom_text(aes(label = avgdrnk), position = position_dodge(width = 0.9), vjust = -0.25) + labs(x = attr(Q1.summary$SEX, "label") %>% capwords(), y = attr(Q1.summary$avgdrnk, "label") %>% capwords(), title = "Which Sex Drinks the Most per Day on Average")
+```
+
+Let's look at this data another way.
+
+```{r}
+Q1 %>% ggplot(aes(SEX, AVEDRNK2)) + geom_boxplot() + geom_jitter(width = 0.2) + labs(x = attr(Q1.summary$SEX, "label") %>% capwords(), y = attr(Q1.summary$avgdrnk, "label") %>% capwords(), title = "What's the Distribution of Average Drinks?")
+
+```
+
+As we can see, there are many outliers, with people drinking up to
+
+---
+
+### How many days on average with poor mental health did people who drink alot have versus people that do not drink alot.
+*MENTHLTH, DRNK3GE5 (Over 10) *
+```{R}
+heavyDrinkers <- LLCP2016 %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+heavyDrinkers$status <- "Heavy"
+lightDrinkers <- LLCP2016 %>% filter(DRNK3GE5<10 & DRNK3GE5 < 76 ) %>% filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(MENTHLTH)
+lightDrinkers$status <- "Light"
+tmp <- rbind(heavyDrinkers, lightDrinkers)
+tmp$MENTHLTH[tmp$MENTHLTH == 88] <- 0
+drinkData <- tmp
+drinkData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) %>% ggplot(aes (x= status, y=avgMentalHealth))+ geom_col() + labs(x= "Drinking Status", y = "Average days (in the last 30) with bad mental health")
+```
+
+---
+
+### What is the general health of people that drink alot versus people that do not drink alot.
+*GENHLTH, DRNK3GE5 (Over 10)*
+```{R}
+LLCP2016 %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH) %>% head()
+heavyDrinkersGen <- LLCP2016 %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH) %>% head()
+heavyDrinkersGen$status <- "Heavy"
+lightDrinkersGen <- LLCP2016 %>% filter(DRNK3GE5<10 & DRNK3GE5 < 76 ) %>% filter(GENHLTH != 7 & GENHLTH != 9) %>% select(GENHLTH) %>% head()
+lightDrinkersGen$status <- "Light"
+
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 1] <- "Excellent"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 2] <- "Very Good"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 3] <- "Good"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 4] <- "Fair"
+heavyDrinkersGen$GENHLTH[heavyDrinkersGen$GENHLTH == 5] <- "Poor"
+
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 1] <- "Excellent"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 2] <- "Very Good"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 3] <- "Good"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 4] <- "Fair"
+lightDrinkersGen$GENHLTH[lightDrinkersGen$GENHLTH == 5] <- "Poor"
+
+heavyDrinkersGen$GENHLTH <- factor(heavyDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+lightDrinkersGen$GENHLTH <- factor(lightDrinkersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+lightDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of light drinkers")
+lightDrinkersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(lightDrinkersGen))
+heavyDrinkersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of heavy drinkers")
+heavyDrinkersGen %>% group_by(GENHLTH) %>% summarise(percentageOfRespondents = n()/nrow(heavyDrinkersGen))
+```
+
+---
+
+### How many days on average with poor mental health did people who smoke alot have versus people that do not smoke a lot or not at all?
+```{R}
+heavySmokers <- LLCP2016 %>% filter(SMOKDAY2==1) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+heavySmokers$status <- "Heavy Smocker"
+moderateSmokers <- LLCP2016 %>% filter(SMOKDAY2==2) %>% filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(MENTHLTH)
+moderateSmokers$status <- "Moderate Smoker"
+nonSmokers <- LLCP2016 %>% filter(SMOKDAY2==3) %>% filter (MENTHLTH <= 30 | MENTHLTH == 88) %>% select(MENTHLTH) 
+nonSmokers$status <- "Non Smoker"
+tmp2 <- rbind(heavySmokers, moderateSmokers, nonSmokers)
+tmp2$MENTHLTH[tmp2$MENTHLTH == 88] <- 0
+smokerData <- tmp2
+smokerData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH))
+smokerData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) %>% 
+  ggplot(aes (x= status, y=avgMentalHealth))+ 
+  geom_col() + labs(x= "Smoking Status",y = "Average days (in the last 30) with bad mental health")+
+  ggtitle("General Health Breakdown vs Smoking Habits")+
+  theme(axis.text=element_text(size=10),axis.title=element_text(size=14), title=element_text(size=16))
+ 
+```
+
+---
+
+### What is the general health of people that smoke alot versus people that do not smoke alot or not at all.
+```{R}
+heavySmokersGen<- LLCP2016 %>% filter(SMOKDAY2==1) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+heavySmokersGen$status <- "Heavy Smocker"
+moderateSmokersGen <- LLCP2016 %>% filter(SMOKDAY2==2) %>% filter(GENHLTH <= 5) %>% select(GENHLTH)
+moderateSmokersGen$status <- "Moderate Smoker"
+nonSmokersGen<- LLCP2016 %>% filter(SMOKDAY2==3) %>% filter (GENHLTH <= 5) %>% select(GENHLTH) 
+nonSmokersGen$status <- "Non Smoker"
+
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 1] <- "Excellent"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 2] <- "Very Good"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 3] <- "Good"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 4] <- "Fair"
+heavySmokersGen$GENHLTH[heavySmokersGen$GENHLTH == 5] <- "Poor"
+
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 1] <- "Excellent"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 2] <- "Very Good"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 3] <- "Good"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 4] <- "Fair"
+moderateSmokersGen$GENHLTH[moderateSmokersGen$GENHLTH == 5] <- "Poor"
+
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 1] <- "Excellent"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 2] <- "Very Good"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 3] <- "Good"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 4] <- "Fair"
+nonSmokersGen$GENHLTH[nonSmokersGen$GENHLTH == 5] <- "Poor"
+
+heavySmokersGen$GENHLTH <- factor(heavySmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+moderateSmokersGen$GENHLTH <- factor(moderateSmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+nonSmokersGen$GENHLTH <- factor(nonSmokersGen$GENHLTH, levels= c("Excellent", "Very Good", "Good", "Fair", "Poor"))
+
+heavySmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of heavy smokers")
+moderateSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of moderate smokers")
+nonSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of nonsmokers")
+
+tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
+tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
+tmp %>% ggplot(aes(x = GENHLTH, fill=status)) + geom_bar(position="fill")+
+  ggtitle("General Health Breakdown vs Smoking Habits")+
+  theme(axis.text=element_text(size=10),axis.title=element_text(size=14), title=element_text(size=16))
+```
+
+---
+
+### What is the relationship between mental health and income.
+```{r}
+LLCP2016 %>% filter (INCOME2 >=1 | INCOME2 <= 8) %>%filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(MENTHLTH) %>% head()
+IncomeMental <- LLCP2016 %>% filter (INCOME2 >=1 | INCOME2<=8) %>%filter(MENTHLTH<=30 | MENTHLTH == 88) %>% select(INCOME2,MENTHLTH)
+IncomeMental$MENTHLTH[IncomeMental$MENTHLTH == 88] <- 0
+IncomeMental2<-IncomeMental[!(IncomeMental$INCOME2==99 | IncomeMental$INCOME2==77),]
+
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 1] <- "Less than 10,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 2] <- "Less than 15,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 3] <- "Less than 20,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 4] <- "Less than 25,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 5] <- "Less than 35,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 6] <- "Less than 50,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 7] <- "Less than 75,000"
+IncomeMental2$INCOME2[IncomeMental2$INCOME2 == 8] <- "More than 75,000"
+
+IncomeMental2%>% group_by(INCOME2) %>% summarise(avgMentalHealth = round(mean(MENTHLTH),2))
+IncomeMental3 <- IncomeMental2 %>% group_by(INCOME2) %>% summarise(avgMentalHealth = round(mean(MENTHLTH),2))
+IncomeMental3$INCOME2 <- as.factor(IncomeMental3$INCOME2)
+IncomeMental3 %>% group_by(INCOME2) %>%
+  ggplot(aes (x= INCOME2, y=avgMentalHealth))+ 
+  geom_col() + labs(x= "Income Status",
+                    y = "Average days (in the last 30) with bad mental health")+ theme(axis.text.x = element_text(angle = 30, hjust = 1))+ggtitle("Income Status vs Mental Health")
+```
+
+---
+
+### What is the marital status of heavy drinkers vs casual/non-drinkers
+```{r}
+heavyDrinkersMar <- LLCP2016 %>% filter(DRNK3GE5>= 10 & DRNK3GE5 < 76) %>% filter(MARITAL != 9 ) %>% select(MARITAL) 
+heavyDrinkersGen$status <- "Heavy"
+lightDrinkersMar <- LLCP2016 %>% filter(DRNK3GE5<10 & DRNK3GE5 < 76 ) %>% filter(MARITAL != 9  ) %>% select(MARITAL)
+lightDrinkersGen$status <- "Light"
+
+
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 1] <- "Married"
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 2] <- "Divorced"
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 3] <- "Widowed"
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 4] <- "Seperated"
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 5] <- "Never Married"
+heavyDrinkersMar$MARITAL[heavyDrinkersMar$MARITAL == 6] <- "Unmarried Couple"
+
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 1] <- "Married"
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 2] <- "Divorced"
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 3] <- "Widowed"
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 4] <- "Seperated"
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 5] <- "Never Married"
+lightDrinkersMar$MARITAL[lightDrinkersMar$MARITAL == 6] <- "Unmarried Couple"
+
+
+heavyDrinkersMar$MARITAL <- factor(heavyDrinkersMar$MARITAL, levels= c("Married", "Divorced", "Widowed", "Never Married", "Unmarried Couple"))
+lightDrinkersMar$MARITAL <- factor(lightDrinkersMar$MARITAL, levels= c("Married", "Divorced", "Widowed", "Never Married", "Unmarried Couple"))
+LDM = as.data.frame(lapply(lightDrinkersMar, na.omit))
+HDM = as.data.frame(lapply(heavyDrinkersMar, na.omit))
+
+na.omit(lightDrinkersMar) %>% head()
+na.omit(heavyDrinkersMar) %>% head()
+LDM %>% ggplot(aes(x=MARITAL))+geom_bar()+ggtitle("General health breakdown of light drinkers Marital Status")
+LDM %>% group_by(MARITAL) %>% summarise(percentageOfRespondents = n()/nrow(lightDrinkersMar))
+HDM %>% ggplot(aes(x=MARITAL))+geom_bar()+ggtitle("General health breakdown of heavy drinkers Marital Status")
+HDM %>% group_by(MARITAL) %>% summarise(percentageOfRespondents = n()/nrow(heavyDrinkersMar))
+```

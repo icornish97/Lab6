@@ -1,0 +1,31 @@
+(Omar) What average number of drinks that males and females have when they drink?
+AVEGRNK2, SEX
+
+(Ian) How many days on average with poor mental health did people who drink alot have versus people that do
+not drink alot.
+MENTHLTH, DRNK3GE5 (Over 10) 
+
+(Ian) What is the general health of people that drink alot versus people that do
+not drink alot.
+GENHLTH, DRNK3GE5 (Over 10) 
+
+(Taylor) How many days on average with poor mental health did people who smoke alot have versus people that do
+not smoke alot.
+MENTHLTH, SMOKDAY2 (Every day(1))
+
+(Taylor) What is the general health of people that do smoke alot versus people that do not smoke alot.
+GENHLTH, SMOKDAY2 (Every day(1))
+
+(tentative) Over time, what is the change in the number of people that drink heavily? 
+time (from dataset) DRNK3GE5 (>10)
+
+(tentative) Over time, what is the change in the number of people that smoke heavily? 
+time (from dataset), SMOKDAY2 
+
+(Austin) What is the relationship between mental health and income.
+MENTHLTH, INCOME2
+
+(Austin) What is the marital status of heavy drinkers vs casual/non-drinkers
+MARITAL, DRNK3GE5 (Over/Under 10)
+
+We can make a map of the country showing where the heaviest drinkers and smokers live. Or a map of the healthiest people.
