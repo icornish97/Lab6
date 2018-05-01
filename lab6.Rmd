@@ -113,8 +113,10 @@ smokerData <- tmp2
 smokerData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH))
 smokerData %>% group_by(status) %>% summarise(avgMentalHealth = mean(MENTHLTH)) %>% 
   ggplot(aes (x= status, y=avgMentalHealth))+ 
-  geom_col() + labs(x= "Smoking Status",
-                    y = "Average days (in the last 30) with bad mental health")
+  geom_col() + labs(x= "Smoking Status",y = "Average days (in the last 30) with bad mental health")+
+  ggtitle("General Health Breakdown vs Smoking Habits")+
+  theme(axis.text=element_text(size=10),axis.title=element_text(size=14), title=element_text(size=16))
+ 
 ```
 What is the general health of people that smoke alot versus people that do not smoke alot or not at all.
 
@@ -153,7 +155,10 @@ moderateSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health
 nonSmokersGen %>% ggplot(aes(x=GENHLTH))+geom_bar()+ggtitle("General health breakdown of nonsmokers")
 
 tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
-tmp %>% ggplot(aes(x = GENHLTH, fill=status)) + geom_bar(position="fill")
+tmp <- rbind(heavySmokersGen, moderateSmokersGen, nonSmokersGen)
+tmp %>% ggplot(aes(x = GENHLTH, fill=status)) + geom_bar(position="fill")+
+  ggtitle("General Health Breakdown vs Smoking Habits")+
+  theme(axis.text=element_text(size=10),axis.title=element_text(size=14), title=element_text(size=16))
 ```
 What is the relationship between mental health and income.
 ```{r}
